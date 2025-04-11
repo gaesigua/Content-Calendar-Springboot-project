@@ -16,12 +16,14 @@ import com.gasigwatin.Content.Calendar.Springboot.project.model.Type;
 import com.gasigwatin.Content.Calendar.Springboot.project.repository.ContentCollectionRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/content")
@@ -48,7 +50,7 @@ public class ContentController {
     }
 
     // Now Let's make a request and find all the pieces of content in the system
-    // and how do we do this? first we write a method, that says we want a list of content
+    // and we do that by first writing a method, that says we want a list of content
     //and how are we going to get all the pieces of content? by using the repository we injected into the controller for us and
     // then use that findAll method; and that will return a list of content
 
@@ -60,6 +62,41 @@ public class ContentController {
     public List<Content> findAll(){
         return repository.findAll();
     }
+    // Now let's build CRUD
+
+    @GetMapping("/{id}")
+    public Content findById(@PathVariable Integer id){
+        return repository.findByid(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Content Not Found"));
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("")
+    public void create(@RequestBody Content content){
+
+        repository.save(content);
+
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{id}")
+    public void update(@RequestBody Content content, @PathVariable Integer id){
+        if(!repository.existsById(id)){
+
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Content Not Found");
+
+        }
+        repository.save(content);
+
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id){
+        repository.delete(id);
+
+    }
+
+
 
 
 }

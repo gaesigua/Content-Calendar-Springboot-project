@@ -5,7 +5,6 @@ import com.gasigwatin.Content.Calendar.Springboot.project.model.Type;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.Optional;
 @Repository
 public class ContentCollectionRepository {
 
-    private final List<Content> content = new ArrayList<>();
+    private final List<Content> contentList = new ArrayList<>();
 
 
 //3. Here we are creating a constructor
@@ -33,7 +32,7 @@ public class ContentCollectionRepository {
     //the first method is to list our content; basically it will return content.
 
     public List<Content> findAll(){
-        return content;
+        return contentList;
 
     }
 
@@ -48,16 +47,22 @@ public class ContentCollectionRepository {
 
     public Optional<Content> findByid(Integer id){
 
-        return content.stream().filter(c->c.id().equals(id)).findFirst();
+        return contentList.stream().filter(c->c.id().equals(id)).findFirst();
+
+    }
+
+    public void save(Content content){
+        contentList.removeIf(c-> c.id().equals(content.id()));
+        contentList.add(content);
 
     }
 
     @PostConstruct
     public void init() {
 
-        Content c = new Content(
+        Content content = new Content(
                 1,
-                "Meine bundes Artikel",
+                "Meine erste Artikel",
                 "Mein Beste Freunde",
                 Status.IDEA,
                 Type.ARTICLE,
@@ -65,8 +70,18 @@ public class ContentCollectionRepository {
                 null,
                 "");
 
-        content.add(c);
+        contentList.add(content);
 
     }
 
+    public boolean existsById(Integer id){
+        return contentList.stream().filter(c->c.id().equals(id)).count() == 1;
     }
+
+    public void delete(Integer id){
+        contentList.removeIf(c->c.id().equals(id));
+
+    }
+
+
+}
